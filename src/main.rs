@@ -1,10 +1,12 @@
-use axum::{extract::State, http::StatusCode, routing::get, Router};
+use axum::Router;
 use dotenv::dotenv;
 use sqlx::sqlite::SqlitePoolOptions;
 use tokio::net::TcpListener;
 use tower_http::compression::CompressionLayer;
 use tower_http::services::ServeDir;
 use tower_livereload::LiveReloadLayer;
+mod db;
+mod search;
 
 #[tokio::main]
 async fn main() {
@@ -20,50 +22,35 @@ async fn main() {
         .expect("can't connect to database");
 
     let mut app = Router::new()
+        .nest("/", search::search_router())
         .nest_service("/assets", ServeDir::new("assets"))
-        .with_state(pool)
-        .layer(CompressionLayer::new());
+        .with_state(pool);
 
     if cfg!(debug_assertions) {
+        println!("Running in debug mode, enabling LiveReload");
         app = app.layer(LiveReloadLayer::new());
     }
+    app = app.layer(CompressionLayer::new());
 
     let port = std::env::var("PORT").unwrap_or("3000".to_string());
     let listener = TcpListener::bind(format!("0.0.0.0:{}", port))
         .await
         .unwrap();
+    println!("Listening on port {}", port);
+
     axum::serve(listener, app).await.unwrap();
 }
 
-// async fn index(State(pool): State<PgPool>) -> Result<String, (StatusCode, String)> {
-//     let messages = sqlx::query("select * from message")
-//         .fetch_one(&pool)
-//         .await
-//         .map_err(internal_error);
-//     println!("{:?}", messages);
-//     sqlx::query_scalar("select 'hello world from pg'")
-//         .fetch_one(&pool)
-//         .await
-//         .map_err(internal_error)
-//     // (StatusCode::OK, "OK".into_response())
-// }
-
-// async fn db_test(State(pool): State<PgPool>) -> Result<String, (StatusCode, String)> {
-//     let messages = sqlx::query("select * from message")
-//         .fetch_one(&pool)
-//         .await
-//         .map_err(internal_error);
-//     println!("{:?}", messages);
-//     sqlx::query_scalar("select 'hello world from pg'")
-//         .fetch_one(&pool)
-//         .await
-//         .map_err(internal_error)
-//     // (StatusCode::OK, "OK".into_response())
-// }
-
-// fn internal_error<E>(err: E) -> (StatusCode, String)
-// where
-//     E: std::error::Error,
-// {
-//     (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
+// async fn index(State(pool): State<SqlitePool>) -> Result<String, (StatusCode, String)> {
+//     let params = GetTitlesParams {
+//         page: Some(0),
+//         ..Default::default()
+//     };
+//     let titles = db::get_titles(pool, params).await;
+//     let s = titles
+//         .iter()
+//         .map(|x| format!("{:?}", x))
+//         .collect::<Vec<String>>()
+//         .join("\n");
+//     Ok(s)
 // }

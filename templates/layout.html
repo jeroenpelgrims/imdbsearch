@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html data-theme="light">
+  <head>
+    <link rel="stylesheet" href="/assets/style.css" />
+    <script src="https://unpkg.com/htmx.org@2.0.2/dist/htmx.min.js"></script>
+  </head>
+
+  <body>
+    <header class="container mx-auto navbar bg-base-100">
+      <div class="flex-1">
+        <a href="/" class="btn btn-ghost text-xl">IMDB Quick search</a>
+      </div>
+
+      <div class="flex-none">
+        <ul class="menu menu-horizontal px-1">
+          <li><a href="/about">About</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-6">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
