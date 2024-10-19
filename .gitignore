@@ -1,1 +1,6 @@
 imdb.db
+/target
+.env
+node_modules
+assets/style.css
+bun.lockb
