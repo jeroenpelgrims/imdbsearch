@@ -1,0 +1,23 @@
+<div id="titles" class="grid gap-4 overflow-x-auto">
+  <table class="table">
+    <!-- head -->
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th class="text-right">Runtime</th>
+        <th class="text-right">Rating</th>
+        <th class="text-right"># Votes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for title in titles %}
+      <tr>
+        <th>{{title.primary_title}} ({{title.premiered}})</th>
+        <td class="text-right">{{title.runtime}} min</td>
+        <td class="text-right">{{title.rating}}</td>
+        <td class="text-right">{{title.votes}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

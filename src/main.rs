@@ -4,6 +4,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 use tokio::net::TcpListener;
 use tower_http::compression::CompressionLayer;
 use tower_http::services::ServeDir;
+use tower_http::trace::TraceLayer;
 use tower_livereload::LiveReloadLayer;
 mod db;
 mod search;
@@ -11,9 +12,18 @@ mod search;
 #[tokio::main]
 async fn main() {
     dotenv().ok();
+    let dev = cfg!(debug_assertions);
 
     let db_connection_str = std::env::var("DATABASE_URL").unwrap();
     println!("Connecting to database: {}", db_connection_str);
+
+    tracing_subscriber::fmt()
+        .with_max_level(if dev {
+            tracing::Level::DEBUG
+        } else {
+            tracing::Level::INFO
+        })
+        .init();
 
     let pool = SqlitePoolOptions::new()
         .max_connections(5)
@@ -31,6 +41,7 @@ async fn main() {
         app = app.layer(LiveReloadLayer::new());
     }
     app = app.layer(CompressionLayer::new());
+    app = app.layer(TraceLayer::new_for_http());
 
     let port = std::env::var("PORT").unwrap_or("3000".to_string());
     let listener = TcpListener::bind(format!("0.0.0.0:{}", port))
@@ -40,17 +51,3 @@ async fn main() {
 
     axum::serve(listener, app).await.unwrap();
 }
-
-// async fn index(State(pool): State<SqlitePool>) -> Result<String, (StatusCode, String)> {
-//     let params = GetTitlesParams {
-//         page: Some(0),
-//         ..Default::default()
-//     };
-//     let titles = db::get_titles(pool, params).await;
-//     let s = titles
-//         .iter()
-//         .map(|x| format!("{:?}", x))
-//         .collect::<Vec<String>>()
-//         .join("\n");
-//     Ok(s)
-// }

@@ -1,3 +1,4 @@
+use serde::Deserialize;
 use sqlx::{query, query_as, sqlite::SqlitePool, Execute, QueryBuilder, Sqlite};
 
 use crate::db;
@@ -13,7 +14,7 @@ pub struct Title {
     pub votes: i32,
 }
 
-#[derive(Default)]
+#[derive(Default, Deserialize)]
 pub struct GetTitlesParams {
     pub page: Option<i32>,
     pub title: Option<String>,
@@ -41,12 +42,11 @@ pub async fn get_titles(pool: SqlitePool, params: GetTitlesParams) -> Vec<Title>
     );
 
     if let Some(title) = params.title {
-        qb.push("(")
-            .push("AND primary_title LIKE ")
+        qb.push("AND (primary_title LIKE ")
             .push_bind(format!("%{}%", title))
-            .push(" OR original_title LIKE ")
+            .push("OR original_title LIKE ")
             .push_bind(format!("%{}%", title))
-            .push(")");
+            .push(") ");
     }
 
     if let Some(max_runtime) = params.max_runtime {

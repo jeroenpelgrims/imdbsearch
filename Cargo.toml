@@ -22,5 +22,9 @@ tower-http = { version = "0.6.1", features = [
     "compression-br",
     "compression-deflate",
     "compression-gzip",
+    "trace",
 ] }
 tower-livereload = "0.9.4"
+serde = { version = "1.0.210" }
+tracing-subscriber = "0.3.18"
+tracing = "0.1.40"
