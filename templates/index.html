@@ -7,6 +7,7 @@
       type="text"
       placeholder="Search movie title"
       class="join-item w-full input input-bordered"
+      hx-trigger="input changed delay:150ms"
       hx-post="/"
     />
     <button type="submit" class="btn btn-primary join-item">Search</button>
