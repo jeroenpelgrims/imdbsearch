@@ -1,17 +1,16 @@
 {% extends "layout.html" %} {% block content %}
 
-<form
-  class="mb-4"
-  hx-post="/"
-  hx-trigger="keyup[throttle:500]"
-  hx-target="#titles"
->
-  <input
-    name="title"
-    type="text"
-    placeholder="Search movie title"
-    class="input input-bordered w-full"
-  />
+<form class="mb-4" method="post" hx-trigger="submit" hx-target="#titles">
+  <div class="join w-full">
+    <input
+      name="title"
+      type="text"
+      placeholder="Search movie title"
+      class="join-item w-full input input-bordered"
+      hx-post="/"
+    />
+    <button type="submit" class="btn btn-primary join-item">Search</button>
+  </div>
 </form>
 
-{% include "titles-table.html" %} {% endblock %}
+<div id="titles">{% include "titles-table.html" %} {% endblock %}</div>

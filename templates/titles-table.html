@@ -1,4 +1,4 @@
-<div id="titles" class="grid gap-4 overflow-x-auto">
+<div class="grid gap-4 overflow-x-auto">
   <table class="table">
     <!-- head -->
     <thead>
@@ -12,7 +12,12 @@
     <tbody>
       {% for title in titles %}
       <tr>
-        <th>{{title.primary_title}} ({{title.premiered}})</th>
+        <th>
+          <a href="https://www.imdb.com/title/{{title.title_id}}">
+            {{title.primary_title}}
+          </a>
+          ({{title.premiered}})
+        </th>
         <td class="text-right">{{title.runtime}} min</td>
         <td class="text-right">{{title.rating}}</td>
         <td class="text-right">{{title.votes}}</td>

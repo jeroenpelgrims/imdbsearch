@@ -38,15 +38,13 @@ pub async fn get_titles(pool: SqlitePool, params: GetTitlesParams) -> Vec<Title>
                 r.votes
             FROM titles t
             INNER JOIN ratings r ON t.title_id = r.title_id
-            WHERE 1 = 1 ",
+            WHERE type = 'movie' ",
     );
 
     if let Some(title) = params.title {
-        qb.push("AND (primary_title LIKE ")
+        qb.push(" AND primary_title LIKE ")
             .push_bind(format!("%{}%", title))
-            .push("OR original_title LIKE ")
-            .push_bind(format!("%{}%", title))
-            .push(") ");
+            .push(" COLLATE NOCASE ");
     }
 
     if let Some(max_runtime) = params.max_runtime {
