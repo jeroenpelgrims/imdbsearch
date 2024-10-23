@@ -1,7 +1,6 @@
+use super::extractor::empty_string_as_none;
 use serde::Deserialize;
-use sqlx::{query, query_as, sqlite::SqlitePool, Execute, QueryBuilder, Sqlite};
-
-use crate::db;
+use sqlx::{sqlite::SqlitePool, QueryBuilder, Sqlite};
 
 #[derive(sqlx::FromRow, Debug, PartialEq)]
 pub struct Title {
@@ -14,14 +13,25 @@ pub struct Title {
     pub votes: i32,
 }
 
-#[derive(Default, Deserialize)]
+#[derive(Clone, Default, Deserialize, Debug)]
 pub struct GetTitlesParams {
+    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub page: Option<i32>,
+    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub title: Option<String>,
+    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub max_runtime: Option<i32>,
+    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub min_score: Option<f32>,
+    #[serde(default, deserialize_with = "empty_string_as_none")]
+    pub max_score: Option<f32>,
+    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub min_votes: Option<i32>,
+    #[serde(default, deserialize_with = "empty_string_as_none")]
+    pub max_votes: Option<i32>,
+    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub min_premiered: Option<i32>,
+    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub max_premiered: Option<i32>,
 }
 
@@ -55,8 +65,16 @@ pub async fn get_titles(pool: SqlitePool, params: GetTitlesParams) -> Vec<Title>
         qb.push(" AND votes > ").push_bind(min_votes);
     }
 
+    if let Some(max_votes) = params.max_votes {
+        qb.push(" AND votes < ").push_bind(max_votes);
+    }
+
     if let Some(min_score) = params.min_score {
         qb.push(" AND rating > ").push_bind(min_score);
+    }
+
+    if let Some(max_score) = params.max_score {
+        qb.push(" AND rating < ").push_bind(max_score);
     }
 
     if let Some(min_premiered) = params.min_premiered {
@@ -72,54 +90,4 @@ pub async fn get_titles(pool: SqlitePool, params: GetTitlesParams) -> Vec<Title>
         .push_bind(params.page.unwrap_or(0) * PAGE_SIZE);
 
     qb.build_query_as().fetch_all(&pool).await.unwrap()
-}
-
-struct Search {
-    id: i64,
-    username: Option<String>,
-    min_age: Option<i8>,
-    max_age: Option<i8>,
-}
-
-fn search_query(search: Search) -> String {
-    let mut query = QueryBuilder::new("SELECT * from users where id = ");
-    query.push_bind(search.id);
-
-    if let Some(username) = search.username {
-        query.push(" AND username = ");
-        query.push_bind(username);
-    }
-
-    if let Some(min_age) = search.min_age {
-        query.push(" AND age > ");
-        query.push_bind(min_age);
-    }
-
-    if let Some(max_age) = search.max_age {
-        query.push(" AND age < ");
-        query.push_bind(max_age);
-    }
-
-    query.build().sql().into()
-}
-
-pub fn main() {
-    dbg!(search_query(Search {
-        id: 12,
-        username: None,
-        min_age: None,
-        max_age: None,
-    })); // "SELECT * from users where id = $1"
-    dbg!(search_query(Search {
-        id: 12,
-        username: Some("Bob".into()),
-        min_age: None,
-        max_age: None,
-    })); // "SELECT * from users where id = $1 AND username = $2"
-    dbg!(search_query(Search {
-        id: 12,
-        username: Some("Bob".into()),
-        min_age: Some(10),
-        max_age: Some(70),
-    })); // "SELECT * from users where id = $1 AND username = $2 AND age > $3 AND age < $4"
 }

@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+axum = { version = "0.7.7", features = [] }
 askama = "0.12.1"
-axum = "0.7.7"
 tokio = { version = "1.40.0", features = ["full"] }
 sqlx = { version = "0.8.2", features = [
     "runtime-tokio-rustls",
