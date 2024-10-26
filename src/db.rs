@@ -20,6 +20,8 @@ pub struct GetTitlesParams {
     #[serde(default, deserialize_with = "empty_string_as_none")]
     pub title: Option<String>,
     #[serde(default, deserialize_with = "empty_string_as_none")]
+    pub min_runtime: Option<i32>,
+    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub max_runtime: Option<i32>,
     #[serde(default, deserialize_with = "empty_string_as_none")]
     pub min_score: Option<f32>,
@@ -57,32 +59,36 @@ pub async fn get_titles(pool: SqlitePool, params: GetTitlesParams) -> Vec<Title>
             .push(" COLLATE NOCASE ");
     }
 
+    if let Some(min_runtime) = params.min_runtime {
+        qb.push(" AND runtime_minutes >= ").push_bind(min_runtime);
+    }
+
     if let Some(max_runtime) = params.max_runtime {
-        qb.push(" AND runtime_minutes < ").push_bind(max_runtime);
+        qb.push(" AND runtime_minutes <= ").push_bind(max_runtime);
     }
 
     if let Some(min_votes) = params.min_votes {
-        qb.push(" AND votes > ").push_bind(min_votes);
+        qb.push(" AND votes >= ").push_bind(min_votes);
     }
 
     if let Some(max_votes) = params.max_votes {
-        qb.push(" AND votes < ").push_bind(max_votes);
+        qb.push(" AND votes <= ").push_bind(max_votes);
     }
 
     if let Some(min_score) = params.min_score {
-        qb.push(" AND rating > ").push_bind(min_score);
+        qb.push(" AND rating >= ").push_bind(min_score);
     }
 
     if let Some(max_score) = params.max_score {
-        qb.push(" AND rating < ").push_bind(max_score);
+        qb.push(" AND rating <= ").push_bind(max_score);
     }
 
     if let Some(min_premiered) = params.min_premiered {
-        qb.push(" AND premiered > ").push_bind(min_premiered);
+        qb.push(" AND premiered >= ").push_bind(min_premiered);
     }
 
     if let Some(max_premiered) = params.max_premiered {
-        qb.push(" AND premiered < ").push_bind(max_premiered);
+        qb.push(" AND premiered <= ").push_bind(max_premiered);
     }
 
     qb.push(" LIMIT ").push_bind(PAGE_SIZE);

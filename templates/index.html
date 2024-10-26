@@ -1,6 +1,13 @@
 {% extends "layout.html" %} {% block content %}
 
-<form id="search" class="mb-4" hx-trigger="submit" hx-target="#titles">
+<form
+  id="search"
+  class="mb-4"
+  hx-trigger="submit, input changed delay:150ms"
+  hx-target="#titles"
+  hx-get="/"
+  hx-replace-url="true"
+>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-4">
     <div class="card card-compact bg-base-100 shadow-xl">
       <div class="card-body">
@@ -95,6 +102,35 @@
         </label>
       </div>
     </div>
+
+    <div class="card card-compact bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Runtime</h2>
+
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">At least</span>
+          </div>
+          <input
+            name="min_runtime"
+            type="number"
+            class="input input-bordered w-full"
+            min="0"
+          />
+        </label>
+
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">At most</span>
+          </div>
+          <input
+            name="max_runtime"
+            type="number"
+            class="input input-bordered w-full"
+          />
+        </label>
+      </div>
+    </div>
   </div>
 
   <div class="join w-full mt-4">
@@ -103,19 +139,11 @@
       type="text"
       placeholder="Search movie title"
       class="join-item w-full input input-bordered"
-      hx-trigger="input changed delay:150ms"
-      hx-get="/"
-      hx-replace-url="true"
     />
     <button type="submit" form="search" class="btn btn-primary join-item">
       Search
     </button>
   </div>
-
-  <div>min/ Max runtime</div>
-  <div>min/max score</div>
-  <div>min/max votes</div>
-  <div>min/max premiered</div>
 </form>
 
 <div id="titles">{% include "titles-table.html" %} {% endblock %}</div>
