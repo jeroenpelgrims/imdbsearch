@@ -39,7 +39,7 @@ async fn main() {
 
     if cfg!(debug_assertions) {
         println!("Running in debug mode, enabling LiveReload");
-        app = app.layer(LiveReloadLayer::new());
+        // app = app.layer(LiveReloadLayer::new());
     }
     app = app.layer(CompressionLayer::new());
     app = app.layer(TraceLayer::new_for_http());

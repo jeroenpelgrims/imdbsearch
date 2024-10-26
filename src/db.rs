@@ -38,7 +38,7 @@ pub struct GetTitlesParams {
 }
 
 pub async fn get_titles(pool: SqlitePool, params: GetTitlesParams) -> Vec<Title> {
-    const PAGE_SIZE: i32 = 10;
+    const PAGE_SIZE: i32 = 50;
     let mut qb: QueryBuilder<Sqlite> = QueryBuilder::new(
         "SELECT
                 t.title_id,
@@ -91,9 +91,9 @@ pub async fn get_titles(pool: SqlitePool, params: GetTitlesParams) -> Vec<Title>
         qb.push(" AND premiered <= ").push_bind(max_premiered);
     }
 
+    let page = (params.page.unwrap_or(1) - 1) * PAGE_SIZE;
     qb.push(" LIMIT ").push_bind(PAGE_SIZE);
-    qb.push(" OFFSET ")
-        .push_bind(params.page.unwrap_or(0) * PAGE_SIZE);
+    qb.push(" OFFSET ").push_bind(page);
 
     qb.build_query_as().fetch_all(&pool).await.unwrap()
 }

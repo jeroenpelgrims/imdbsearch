@@ -52,7 +52,7 @@
             name="min_score"
             type="number"
             class="input input-bordered w-full"
-            value="7"
+            value="{{ form_data.min_score.unwrap_or(7.0) }}"
             min="0"
             max="10"
           />
@@ -66,6 +66,7 @@
             name="max_score"
             type="number"
             class="input input-bordered w-full"
+            value="{{ form_data.max_score|display_some }}"
             min="0"
             max="10"
           />
@@ -85,7 +86,7 @@
             name="min_votes"
             type="number"
             class="input input-bordered w-full"
-            value="10000"
+            value="{{ form_data.min_votes.unwrap_or(10000) }}"
             min="0"
           />
         </label>
@@ -98,6 +99,7 @@
             name="max_votes"
             type="number"
             class="input input-bordered w-full"
+            value="{{ form_data.max_votes|display_some }}"
           />
         </label>
       </div>
@@ -116,6 +118,7 @@
             type="number"
             class="input input-bordered w-full"
             min="0"
+            value="{{ form_data.min_runtime|display_some }}"
           />
         </label>
 
@@ -127,6 +130,7 @@
             name="max_runtime"
             type="number"
             class="input input-bordered w-full"
+            value="{{ form_data.max_runtime|display_some }}"
           />
         </label>
       </div>
@@ -146,4 +150,21 @@
   </div>
 </form>
 
-<div id="titles">{% include "titles-table.html" %} {% endblock %}</div>
+<div class="grid gap-4 overflow-x-auto">
+  <table class="table">
+    <!-- head -->
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th class="text-right">Runtime</th>
+        <th class="text-right">Rating</th>
+        <th class="text-right"># Votes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for title in titles %} {% let is_last = loop.last %} {% include
+      "title-row.html" %} {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+<tr
+  {%
+  if
+  is_last
+  %}
+  hx-get="/?page={{next_page}}"
+  hx-trigger="revealed"
+  hx-swap="afterend"
+  {%
+  endif
+  %}
+>
+  <td>
+    <a href="https://www.imdb.com/title/{{title.title_id}}">
+      {{title.primary_title}}
+    </a>
+    ({{title.premiered}})
+  </td>
+  <td class="text-right">{{title.runtime}} min</td>
+  <td class="text-right">{{title.rating}}</td>
+  <td class="text-right">{{title.votes}}</td>
+</tr>

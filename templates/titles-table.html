@@ -10,19 +10,8 @@
       </tr>
     </thead>
     <tbody>
-      {% for title in titles %}
-      <tr>
-        <th>
-          <a href="https://www.imdb.com/title/{{title.title_id}}">
-            {{title.primary_title}}
-          </a>
-          ({{title.premiered}})
-        </th>
-        <td class="text-right">{{title.runtime}} min</td>
-        <td class="text-right">{{title.rating}}</td>
-        <td class="text-right">{{title.votes}}</td>
-      </tr>
-      {% endfor %}
+      {% for title in titles %} {% let is_last = loop.last %} {% include
+      "title-row.html" %} {% endfor %}
     </tbody>
   </table>
 </div>
