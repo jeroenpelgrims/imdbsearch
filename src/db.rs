@@ -13,7 +13,7 @@ pub struct Title {
     pub votes: i32,
 }
 
-#[derive(Clone, Default, Deserialize, Debug)]
+#[derive(Clone, Deserialize, Debug, serde::Serialize)]
 pub struct GetTitlesParams {
     #[serde(default, deserialize_with = "empty_string_as_none")]
     pub page: Option<i32>,
@@ -37,20 +37,44 @@ pub struct GetTitlesParams {
     pub max_premiered: Option<i32>,
 }
 
+impl GetTitlesParams {
+    pub fn next_page(&self) -> String {
+        let next_params = GetTitlesParams {
+            page: Some(self.page.unwrap_or(1) + 1),
+            ..self.clone()
+        };
+        serde_qs::to_string(&next_params).unwrap()
+    }
+
+    pub fn prev_page(&self) -> Option<String> {
+        let page = self.page.unwrap_or(1);
+
+        if (page - 1) <= 0 {
+            return None;
+        }
+
+        let next_params = GetTitlesParams {
+            page: Some(self.page.unwrap_or(1) - 1),
+            ..self.clone()
+        };
+        Some(serde_qs::to_string(&next_params).unwrap())
+    }
+}
+
 pub async fn get_titles(pool: SqlitePool, params: GetTitlesParams) -> Vec<Title> {
     const PAGE_SIZE: i32 = 50;
     let mut qb: QueryBuilder<Sqlite> = QueryBuilder::new(
         "SELECT
-                t.title_id,
-                primary_title,
-                original_title,
-                premiered,
-                runtime_minutes as runtime,
-                CAST(r.rating AS REAL) AS rating,
-                r.votes
-            FROM titles t
-            INNER JOIN ratings r ON t.title_id = r.title_id
-            WHERE type = 'movie' ",
+            t.title_id,
+            primary_title,
+            original_title,
+            premiered,
+            runtime_minutes as runtime,
+            CAST(r.rating AS REAL) AS rating,
+            r.votes
+        FROM titles t
+        INNER JOIN ratings r ON t.title_id = r.title_id
+        WHERE type = 'movie' ",
     );
 
     if let Some(title) = params.title {

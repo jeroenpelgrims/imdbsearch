@@ -3,7 +3,7 @@
 <form
   id="search"
   class="mb-4"
-  hx-trigger="submit, input changed delay:150ms"
+  hx-trigger="submit"
   hx-target="#titles"
   hx-get="/"
   hx-replace-url="true"
@@ -34,7 +34,6 @@
             name="max_premiered"
             type="number"
             class="input input-bordered w-full"
-            value="{{ form_data.max_premiered|display_some }}"
           />
         </label>
       </div>
@@ -66,7 +65,6 @@
             name="max_score"
             type="number"
             class="input input-bordered w-full"
-            value="{{ form_data.max_score|display_some }}"
             min="0"
             max="10"
           />
@@ -99,7 +97,6 @@
             name="max_votes"
             type="number"
             class="input input-bordered w-full"
-            value="{{ form_data.max_votes|display_some }}"
           />
         </label>
       </div>
@@ -118,7 +115,6 @@
             type="number"
             class="input input-bordered w-full"
             min="0"
-            value="{{ form_data.min_runtime|display_some }}"
           />
         </label>
 
@@ -130,7 +126,6 @@
             name="max_runtime"
             type="number"
             class="input input-bordered w-full"
-            value="{{ form_data.max_runtime|display_some }}"
           />
         </label>
       </div>
@@ -161,10 +156,21 @@
         <th class="text-right"># Votes</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="titles">
       {% for title in titles %} {% let is_last = loop.last %} {% include
       "title-row.html" %} {% endfor %}
     </tbody>
   </table>
 </div>
+
+<div class="flex content-center mt-4">
+  <div class="join">
+    {% if let Some(prev_page) = form_data.prev_page() %}
+    <a href="/?{{ prev_page }}" class="join-item btn">«</a>
+    {% endif %}
+    <button class="join-item btn">Page {{form_data.page|display_some}}</button>
+    <a href="/?{{form_data.next_page()}}" class="join-item btn">»</a>
+  </div>
+</div>
+
 {% endblock %}

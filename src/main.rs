@@ -5,7 +5,7 @@ use tokio::net::TcpListener;
 use tower_http::compression::CompressionLayer;
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
-use tower_livereload::LiveReloadLayer;
+// use tower_livereload::LiveReloadLayer;
 mod db;
 mod extractor;
 mod index;
@@ -13,7 +13,7 @@ mod index;
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    let dev = cfg!(debug_assertions);
+    // let dev = cfg!(debug_assertions);
 
     let db_connection_str = std::env::var("DATABASE_URL").unwrap();
     println!("Connecting to database: {}", db_connection_str);
