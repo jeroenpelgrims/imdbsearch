@@ -132,7 +132,22 @@
     </div>
   </div>
 
-  <div class="join w-full mt-4">
+  <div class="card card-compact bg-base-100 shadow-xl my-4">
+    <div class="card-body">
+      <h2 class="card-title">Genres</h2>
+
+      <div class="grid grid-cols-4 gap-2">
+        {% for genre in genres %}
+        <label>
+          <input name="genres" type="checkbox" value="{{genre}}" />
+          {{genre}}
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="join w-full my-4">
     <input
       name="title"
       type="text"
@@ -147,7 +162,6 @@
 
 <div class="grid gap-4 overflow-x-auto">
   <table class="table">
-    <!-- head -->
     <thead>
       <tr>
         <th>Title</th>
@@ -163,7 +177,7 @@
   </table>
 </div>
 
-<div class="flex content-center mt-4">
+<div class="flex justify-center mt-4">
   <div class="join">
     {% if let Some(prev_page) = form_data.prev_page() %}
     <a href="/?{{ prev_page }}" class="join-item btn">«</a>

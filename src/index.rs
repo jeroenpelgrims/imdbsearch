@@ -4,8 +4,9 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::{Html, IntoResponse},
     routing::get,
-    Form, Router,
+    Router,
 };
+use axum_extra::extract::Form;
 use serde_qs;
 use sqlx::{Pool, Sqlite, SqlitePool};
 
@@ -22,6 +23,7 @@ struct IndexTemplate<'a> {
     titles: Vec<db::Title>,
     next_page: &'a str,
     form_data: &'a db::GetTitlesParams,
+    genres: Vec<&'static str>,
 }
 
 #[derive(Template)]
@@ -59,10 +61,40 @@ async fn get_index(
             .collect();
         templates.join("\n")
     } else {
+        let genres = vec![
+            "Action",
+            "Adult",
+            "Adventure",
+            "Animation",
+            "Biography",
+            "Comedy",
+            "Crime",
+            "Documentary",
+            "Drama",
+            "Family",
+            "Fantasy",
+            "Game-Show",
+            "History",
+            "Horror",
+            "Music",
+            "Musical",
+            "Mystery",
+            "News",
+            "Reality-TV",
+            "Romance",
+            "Sci-Fi",
+            "Short",
+            "Sport",
+            "Talk-Show",
+            "Thriller",
+            "War",
+            "Western",
+        ];
         IndexTemplate {
             titles,
             form_data: &form_data,
             next_page: &next_page_qs,
+            genres,
         }
         .render()
         .unwrap()

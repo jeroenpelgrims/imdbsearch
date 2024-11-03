@@ -1,4 +1,5 @@
-use super::extractor::empty_string_as_none;
+use std::os::unix::raw::gid_t;
+
 use serde::Deserialize;
 use sqlx::{sqlite::SqlitePool, QueryBuilder, Sqlite};
 
@@ -15,26 +16,17 @@ pub struct Title {
 
 #[derive(Clone, Deserialize, Debug, serde::Serialize)]
 pub struct GetTitlesParams {
-    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub page: Option<i32>,
-    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub title: Option<String>,
-    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub min_runtime: Option<i32>,
-    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub max_runtime: Option<i32>,
-    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub min_score: Option<f32>,
-    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub max_score: Option<f32>,
-    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub min_votes: Option<i32>,
-    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub max_votes: Option<i32>,
-    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub min_premiered: Option<i32>,
-    #[serde(default, deserialize_with = "empty_string_as_none")]
     pub max_premiered: Option<i32>,
+    pub genres: Option<Vec<String>>,
 }
 
 impl GetTitlesParams {
@@ -113,6 +105,17 @@ pub async fn get_titles(pool: SqlitePool, params: GetTitlesParams) -> Vec<Title>
 
     if let Some(max_premiered) = params.max_premiered {
         qb.push(" AND premiered <= ").push_bind(max_premiered);
+    }
+
+    if let Some(genres) = params.genres {
+        qb.push(" AND (");
+        for (i, genre) in genres.iter().enumerate() {
+            if i > 0 {
+                qb.push(" OR ");
+            }
+            qb.push(" genres LIKE ").push_bind(format!("%{}%", genre));
+        }
+        qb.push(" ) ");
     }
 
     let page = (params.page.unwrap_or(1) - 1) * PAGE_SIZE;
