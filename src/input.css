@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#pagination .loading {
+    opacity:0;
+    transition: opacity 500ms ease-in;
+}
+
+#pagination.htmx-request .loading {
+    opacity: 1;
+}
+
+#pagination.htmx-request .buttons {
+    display: none;
+}

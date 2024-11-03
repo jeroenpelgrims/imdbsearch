@@ -187,14 +187,19 @@
   </table>
 </div>
 
-<div class="flex justify-center mt-4">
-  <div class="join">
-    {% if let Some(prev_page) = form_data.prev_page() %}
-    <a href="/?{{ prev_page }}" class="join-item btn">«</a>
-    {% endif %}
-    <button class="join-item btn">Page {{form_data.page|display_some}}</button>
-    <a href="/?{{form_data.next_page()}}" class="join-item btn">»</a>
+<div id="pagination" class="flex justify-center mt-4">
+  <div class="buttons">
+    <div class="join">
+      {% if let Some(prev_page) = form_data.prev_page() %}
+      <a href="/?{{ prev_page }}" class="join-item btn">«</a>
+      {% endif %}
+      <button class="join-item btn">
+        Page {{form_data.page|display_some}}
+      </button>
+      <a href="/?{{form_data.next_page()}}" class="join-item btn">»</a>
+    </div>
   </div>
-</div>
 
+  <span class="loading loading-spinner loading-lg"></span>
+</div>
 {% endblock %}
