@@ -1,7 +1,5 @@
-use std::os::unix::raw::gid_t;
-
 use serde::Deserialize;
-use sqlx::{sqlite::SqlitePool, QueryBuilder, Sqlite};
+use sqlx::{sqlite::SqlitePool, Execute, QueryBuilder, Sqlite};
 
 #[derive(sqlx::FromRow, Debug, PartialEq)]
 pub struct Title {
@@ -122,5 +120,6 @@ pub async fn get_titles(pool: SqlitePool, params: GetTitlesParams) -> Vec<Title>
     qb.push(" LIMIT ").push_bind(PAGE_SIZE);
     qb.push(" OFFSET ").push_bind(page);
 
-    qb.build_query_as().fetch_all(&pool).await.unwrap()
+    let query = qb.build_query_as();
+    query.fetch_all(&pool).await.unwrap()
 }

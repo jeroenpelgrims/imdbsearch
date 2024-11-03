@@ -7,11 +7,42 @@ use axum::{
     Router,
 };
 use axum_extra::extract::Form;
+use indexmap::IndexMap;
 use serde_qs;
 use sqlx::{Pool, Sqlite, SqlitePool};
 
 use crate::db;
 use crate::extractor::filters;
+
+const GENRES: [&str; 27] = [
+    "Action",
+    "Adult",
+    "Adventure",
+    "Animation",
+    "Biography",
+    "Comedy",
+    "Crime",
+    "Documentary",
+    "Drama",
+    "Family",
+    "Fantasy",
+    "Game-Show",
+    "History",
+    "Horror",
+    "Music",
+    "Musical",
+    "Mystery",
+    "News",
+    "Reality-TV",
+    "Romance",
+    "Sci-Fi",
+    "Short",
+    "Sport",
+    "Talk-Show",
+    "Thriller",
+    "War",
+    "Western",
+];
 
 pub fn index_router() -> Router<Pool<Sqlite>> {
     Router::new().route("/", get(get_index))
@@ -23,7 +54,7 @@ struct IndexTemplate<'a> {
     titles: Vec<db::Title>,
     next_page: &'a str,
     form_data: &'a db::GetTitlesParams,
-    genres: Vec<&'static str>,
+    genres: IndexMap<String, bool>,
 }
 
 #[derive(Template)]
@@ -61,40 +92,24 @@ async fn get_index(
             .collect();
         templates.join("\n")
     } else {
-        let genres = vec![
-            "Action",
-            "Adult",
-            "Adventure",
-            "Animation",
-            "Biography",
-            "Comedy",
-            "Crime",
-            "Documentary",
-            "Drama",
-            "Family",
-            "Fantasy",
-            "Game-Show",
-            "History",
-            "Horror",
-            "Music",
-            "Musical",
-            "Mystery",
-            "News",
-            "Reality-TV",
-            "Romance",
-            "Sci-Fi",
-            "Short",
-            "Sport",
-            "Talk-Show",
-            "Thriller",
-            "War",
-            "Western",
-        ];
+        let genres_selected = GENRES
+            .iter()
+            .map(|genre| {
+                let genre_owned = genre.to_string();
+                let selected = form_data
+                    .genres
+                    .as_ref()
+                    .is_some_and(|genres| genres.contains(&genre_owned))
+                    .clone();
+                (genre_owned, selected)
+            })
+            .collect::<IndexMap<String, bool>>();
+
         IndexTemplate {
             titles,
             form_data: &form_data,
             next_page: &next_page_qs,
-            genres,
+            genres: genres_selected,
         }
         .render()
         .unwrap()

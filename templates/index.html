@@ -137,9 +137,19 @@
       <h2 class="card-title">Genres</h2>
 
       <div class="grid grid-cols-4 gap-2">
-        {% for genre in genres %}
+        {% for (genre, selected) in genres %}
         <label>
-          <input name="genres" type="checkbox" value="{{genre}}" />
+          <input
+            name="genres"
+            type="checkbox"
+            value="{{genre}}"
+            {%
+            if
+            selected
+            %}checked{%
+            endif
+            %}
+          />
           {{genre}}
         </label>
         {% endfor %}
